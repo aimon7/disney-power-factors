@@ -1,0 +1,28 @@
+<mat-grid-list cols="3">
+    <mat-grid-tile>
+        <mat-form-field>
+            <mat-label>Items per page:</mat-label>
+            <mat-select [(value)]="pageSize" (selectionChange)="onPageSizeChangeHandler(pageSize)">
+                <mat-option *ngFor="let option of pageSizeOptions" [value]="option">
+                    {{ option }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </mat-grid-tile>
+
+    <mat-grid-tile>
+        <div class="mat-paginator-range-label">
+            Page {{ currentPage }} of {{ totalPages }}
+        </div>
+    </mat-grid-tile>
+
+    <mat-grid-tile>
+        <button mat-icon-button [disabled]="currentPage === 1" (click)="onPageChangeHandler(currentPage - 1)">
+            <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <button mat-icon-button [disabled]="currentPage === totalPages" (click)="onPageChangeHandler(currentPage + 1)">
+            <mat-icon>chevron_right</mat-icon>
+        </button>
+    </mat-grid-tile>
+</mat-grid-list>
