@@ -1,5 +1,20 @@
+<!-- Need to add loading and error handling -->
+
 <div class="mat-elevation-z8" style="width: 100%;">
-    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="announceSortChange($event)">
+    <div class="loading-indicator" *ngIf="loading">
+        Loading...
+    </div>
+
+    <div class="error-message" *ngIf="error">
+        {{ error }}
+    </div>
+
+    <div class="no-data-message" *ngIf="!loading && !error && !dataSource.data.length">
+        No data available
+    </div>
+
+    <table mat-table *ngIf="!loading && !error && dataSource.data.length > 0" [dataSource]="dataSource" matSort
+        (matSortChange)="announceSortChange($event)" [class.loading]="loading">
 
         <!-- Character name Column -->
         <ng-container matColumnDef="name">
@@ -45,9 +60,10 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
 
-    <!-- <mat-paginator [pageSizeOptions]="pageSizeOptions" aria-label="Select page of disney characters"> -->
-    <!-- </mat-paginator> -->
-    <app-paginator-helper [initialPageSize]="initialPageSize" [totalPages]="paginationInfo.totalPages"
-        [initialPageSizeOptions]="pageSizeOptions">
+    <app-paginator-helper 
+        [initialPageSize]="initialPageSize"
+        [totalPages]="paginationInfo.totalPages" 
+        [initialPageSizeOptions]="pageSizeOptions"
+    >
     </app-paginator-helper>
 </div>

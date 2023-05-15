@@ -79,7 +79,7 @@ export class CharactersComponent implements OnInit {
 
   pageSize: number = this.initialPageSize;
   page: number = this.initialPage;
-  
+
   characters: DisneyCharacter[] = [];
   paginationInfo: PaginationInfo = {} as PaginationInfo;
   loading = true;
@@ -99,15 +99,16 @@ export class CharactersComponent implements OnInit {
    }
 
   ngAfterViewInit() {
-
     this.apolloQuery({
       pageSize: this.pageSize,
       page: this.page,
     });
-    
+
     this.dataSource.sort = this.sort;
 
     this.paginator.onPageChange.subscribe((event: number) => {
+      this.loading = true;
+
       this.apolloQuery({
         pageSize: this.pageSize,
         page: event,
@@ -115,6 +116,7 @@ export class CharactersComponent implements OnInit {
     });
 
     this.paginator.onPageSizeChange.subscribe((event: number) => {
+      this.loading = true;
       this.pageSize = event;
 
       this.apolloQuery({
@@ -144,13 +146,13 @@ export class CharactersComponent implements OnInit {
       })
       .valueChanges.subscribe((result: any) => {
         this.handleQueryResult(result);
+        this.loading = false;
       });
   }
 
   handleQueryResult(result: any) {
     this.characters = result?.data?.characters?.items;
     this.paginationInfo = result?.data?.characters?.paginationInfo;
-    this.loading = result.loading;
     this.error = result.error;
 
     this.dataSource = new MatTableDataSource(this.characters.map((character: DisneyCharacter) => {
