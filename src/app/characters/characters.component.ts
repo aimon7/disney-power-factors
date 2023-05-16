@@ -1,10 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { MatPaginator } from '@angular/material/paginator';
+import { Subscription } from 'rxjs';
 import { MatSort, Sort } from '@angular/material/sort';
+import {MatDialog} from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { PaginatorHelperComponent } from '../component/paginator-helper/paginator-helper.component';
+import { CharacterDetailComponent } from './character-detail/character-detail.component';
 
 const GET_CHARACTERS = gql`
   query Characters($page: Int, $pageSize: Int) {
@@ -34,12 +36,13 @@ const GET_CHARACTERS = gql`
   }
 `;
 
-export interface DisneyCharacter {
+export interface IDisneyCharacter {
   _id: string;
   url: string;
   name: string;
   sourceUrl: string;
   films: string[];
+  imageUrl: string;
   shortFilms: string[];
   tvShows: string[];
   videoGames: string[];
@@ -80,17 +83,20 @@ export class CharactersComponent implements OnInit {
   pageSize: number = this.initialPageSize;
   page: number = this.initialPage;
 
-  characters: DisneyCharacter[] = [];
+  characters: IDisneyCharacter[] = [];
   paginationInfo: PaginationInfo = {} as PaginationInfo;
-  loading = true;
+  loading: boolean;
   error: any;
+
+  private querySubscription: Subscription;
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(PaginatorHelperComponent) paginator!: PaginatorHelperComponent;
 
   constructor(
     private apollo: Apollo,
-    private _liveAnnouncer: LiveAnnouncer
+    private _liveAnnouncer: LiveAnnouncer,
+    public dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -99,7 +105,7 @@ export class CharactersComponent implements OnInit {
    }
 
   ngAfterViewInit() {
-    this.apolloQuery({
+    this.querySubscription = this.apolloQuery({
       pageSize: this.pageSize,
       page: this.page,
     });
@@ -107,8 +113,6 @@ export class CharactersComponent implements OnInit {
     this.dataSource.sort = this.sort;
 
     this.paginator.onPageChange.subscribe((event: number) => {
-      this.loading = true;
-
       this.apolloQuery({
         pageSize: this.pageSize,
         page: event,
@@ -116,7 +120,6 @@ export class CharactersComponent implements OnInit {
     });
 
     this.paginator.onPageSizeChange.subscribe((event: number) => {
-      this.loading = true;
       this.pageSize = event;
 
       this.apolloQuery({
@@ -135,32 +138,42 @@ export class CharactersComponent implements OnInit {
     }
   }
 
+  openDialog(id: string) {
+    const dialogRef = this.dialog.open(CharacterDetailComponent, {
+      data: { character: this.characters.find((character: IDisneyCharacter) => character._id === id) },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
+  }
+
   apolloQuery(variables: {
     pageSize: number;
     page: number;
   }) {
-    this.apollo
+    return this.apollo
       .watchQuery({
         query: GET_CHARACTERS,
         variables,
       })
-      .valueChanges.subscribe((result: any) => {
-        this.handleQueryResult(result);
-        this.loading = false;
+      .valueChanges.subscribe(({data, loading, error}) => {
+        this.handleQueryResult(data);
+        this.loading = loading;
+        this.error = error;
       });
   }
 
   handleQueryResult(result: any) {
-    this.characters = result?.data?.characters?.items;
-    this.paginationInfo = result?.data?.characters?.paginationInfo;
-    this.error = result.error;
+    this.characters = result?.characters?.items;
+    this.paginationInfo = result?.characters?.paginationInfo;
 
-    this.dataSource = new MatTableDataSource(this.characters.map((character: DisneyCharacter) => {
+    this.dataSource = new MatTableDataSource(this.characters.map((character: IDisneyCharacter) => {
       return this.mappingCharacterToTable(character);
     }));
   }
 
-  mappingCharacterToTable(character: DisneyCharacter): DisneyCharacterTable {
+  mappingCharacterToTable(character: IDisneyCharacter): DisneyCharacterTable {
     const { tvShows, videoGames, name, allies, enemies, _id } = character;
 
     return {
@@ -182,4 +195,10 @@ export class CharactersComponent implements OnInit {
     const startIndex = page * pageSize;
     return `${initialText} ${startIndex + 1} of ${length}`;
   };
+ 
+  ngOnDestroy() {
+    this.querySubscription.unsubscribe();
+    this.paginator.onPageChange.unsubscribe();
+    this.paginator.onPageSizeChange.unsubscribe();
+  }
 }

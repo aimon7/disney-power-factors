@@ -57,13 +57,11 @@
 
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr mat-row class="element-row" *matRowDef="let row; columns: displayedColumns" (click)="openDialog(row.id)">
+        </tr>
     </table>
 
-    <app-paginator-helper 
-        [initialPageSize]="initialPageSize"
-        [totalPages]="paginationInfo.totalPages" 
-        [initialPageSizeOptions]="pageSizeOptions"
-    >
+    <app-paginator-helper [initialPageSize]="initialPageSize" [totalPages]="paginationInfo.totalPages"
+        [initialPageSizeOptions]="pageSizeOptions">
     </app-paginator-helper>
 </div>

@@ -1,0 +1,23 @@
+<h2 mat-dialog-title *ngIf="data.character">{{data.character.name | uppercase}} Details</h2>
+
+<mat-dialog-content class="mat-typography">
+    <div *ngIf="data.character"><span><strong>Name: </strong></span>{{data.character.name}}</div>
+    <div *ngIf="data.character">
+        <img src="{{data.character.imageUrl}}" alt="{{data.character.name}} image" />
+    </div>
+    <div *ngIf="data.character">
+        <div><span><strong>List of tv shows:</strong></span></div>
+        <mat-list role="list"  *ngFor="let tvShow of data.character.tvShows">
+            <mat-list-item role="listitem">{{tvShow}}</mat-list-item>
+        </mat-list>
+    </div>
+    <div *ngIf="data.character">
+        <div><span><strong>List of video games:</strong></span></div>
+        <mat-list role="list"  *ngFor="let videoGame of data.character.videoGames">
+            <mat-list-item role="listitem">{{videoGame}}</mat-list-item>
+        </mat-list>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>
