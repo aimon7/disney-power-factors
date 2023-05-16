@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Subscription } from 'rxjs';
 import { MatSort, Sort } from '@angular/material/sort';
-import {MatDialog} from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { PaginatorHelperComponent } from '../component/paginator-helper/paginator-helper.component';
@@ -90,7 +90,11 @@ export class CharactersComponent implements OnInit {
 
   private querySubscription: Subscription;
 
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatSort) set matSort(sort: MatSort) {
+    if (!this.dataSource.sort) {
+      this.dataSource.sort = sort;
+    }
+  }
   @ViewChild(PaginatorHelperComponent) paginator!: PaginatorHelperComponent;
 
   constructor(
@@ -102,15 +106,13 @@ export class CharactersComponent implements OnInit {
   ngOnInit(): void {
     this.pageSize = this.initialPageSize
     this.page = this.initialPage;
-   }
+  }
 
   ngAfterViewInit() {
     this.querySubscription = this.apolloQuery({
       pageSize: this.pageSize,
       page: this.page,
     });
-
-    this.dataSource.sort = this.sort;
 
     this.paginator.onPageChange.subscribe((event: number) => {
       this.apolloQuery({
@@ -131,6 +133,7 @@ export class CharactersComponent implements OnInit {
 
   /** Announce the change in sort state for assistive technology. */
   announceSortChange(sortState: Sort) {
+    console.log(sortState);
     if (sortState.direction) {
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
     } else {
@@ -157,7 +160,7 @@ export class CharactersComponent implements OnInit {
         query: GET_CHARACTERS,
         variables,
       })
-      .valueChanges.subscribe(({data, loading, error}) => {
+      .valueChanges.subscribe(({ data, loading, error }) => {
         this.handleQueryResult(data);
         this.loading = loading;
         this.error = error;
@@ -195,7 +198,7 @@ export class CharactersComponent implements OnInit {
     const startIndex = page * pageSize;
     return `${initialText} ${startIndex + 1} of ${length}`;
   };
- 
+
   ngOnDestroy() {
     this.querySubscription.unsubscribe();
     this.paginator.onPageChange.unsubscribe();

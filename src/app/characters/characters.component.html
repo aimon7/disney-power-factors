@@ -13,34 +13,35 @@
         No data available
     </div>
 
-    <table mat-table *ngIf="!loading && !error && dataSource.data.length > 0" [dataSource]="dataSource" matSort
+    <table mat-table *ngIf="!loading && !error && dataSource.data.length > 0" [dataSource]="dataSource"
+         matSort
         (matSortChange)="announceSortChange($event)" [class.loading]="loading">
 
         <!-- Character name Column -->
         <ng-container matColumnDef="name">
             <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by name">
                 Name </th>
-            <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            <td mat-cell *matCellDef="let row"> {{row.name}} </td>
         </ng-container>
 
         <!-- Number of tv shows Column -->
         <ng-container matColumnDef="tvShowsParticapating">
             <th mat-header-cell *matHeaderCellDef> No. of Tv Shows </th>
-            <td mat-cell *matCellDef="let element"> {{element.tvShowsParticapating}} </td>
+            <td mat-cell *matCellDef="let row"> {{row.tvShowsParticapating}} </td>
         </ng-container>
 
         <!-- Number of Video Games Column -->
         <ng-container matColumnDef="videoGamesParticipating">
             <th mat-header-cell *matHeaderCellDef> No. of Video Games </th>
-            <td mat-cell *matCellDef="let element"> {{element.videoGamesParticipating}} </td>
+            <td mat-cell *matCellDef="let row"> {{row.videoGamesParticipating}} </td>
         </ng-container>
 
         <!-- Allies Column -->
         <ng-container matColumnDef="allies">
             <th mat-header-cell *matHeaderCellDef> Allies </th>
-            <td mat-cell *matCellDef="let element">
+            <td mat-cell *matCellDef="let row">
                 <mat-chip-listbox>
-                    <mat-chip *ngFor="let ally of element.allies">{{ ally }}</mat-chip>
+                    <mat-chip *ngFor="let ally of row.allies">{{ ally }}</mat-chip>
                 </mat-chip-listbox>
             </td>
         </ng-container>
@@ -48,9 +49,9 @@
         <!-- Emenies Column -->
         <ng-container matColumnDef="enemies">
             <th mat-header-cell *matHeaderCellDef> Enemies </th>
-            <td mat-cell *matCellDef="let element">
+            <td mat-cell *matCellDef="let row">
                 <mat-chip-listbox>
-                    <mat-chip *ngFor="let enemy of element.enemies">{{ enemy }}</mat-chip>
+                    <mat-chip *ngFor="let enemy of row.enemies">{{ enemy }}</mat-chip>
                 </mat-chip-listbox>
             </td>
         </ng-container>
