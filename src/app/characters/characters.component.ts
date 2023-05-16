@@ -133,7 +133,6 @@ export class CharactersComponent implements OnInit {
 
   /** Announce the change in sort state for assistive technology. */
   announceSortChange(sortState: Sort) {
-    console.log(sortState);
     if (sortState.direction) {
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
     } else {
@@ -147,7 +146,7 @@ export class CharactersComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
+      // console.log(`Dialog result: ${result}`);
     });
   }
 
