@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import exporting from 'highcharts/modules/exporting';
 import exportData from 'highcharts/modules/export-data';
@@ -17,10 +17,11 @@ exportData(Highcharts);
   standalone: true,
   imports: [HighchartsChartModule],
 })
-export class PieChartComponent {
+export class PieChartComponent implements OnChanges {
   @Input() characters: IDisneyCharacter[] = [];
 
   Highcharts: typeof Highcharts = Highcharts;
+  updateFlag = false;
 
   chartRef: Highcharts.Chart;
 
@@ -31,34 +32,11 @@ export class PieChartComponent {
   options: Highcharts.Options = {
     chart: {
       plotShadow: false,
-      events: {
-        load: () => {
-          const chart = this.chartRef;
-
-          const data = this.characters.map((character: IDisneyCharacter) => ({
-            name: character.name,
-            y: character.films.length,
-            films: character.films,
-          }));
-
-          chart.addSeries({
-            type: 'pie',
-            name: 'Number of movies',
-            data,
-          }, true);
-
-          chart.update({
-            navigator: {
-              series: {
-                data
-              }
-            }
-          })
-        }
-      }
+      type: 'pie',
     },
     title: {
-      text: 'Number of movies by character'
+      text: 'Number of movies by character',
+      align: 'left',
     },
     tooltip: {
       useHTML: true,
@@ -86,6 +64,15 @@ export class PieChartComponent {
         showInLegend: true,
       }
     },
+    series: [{
+      type: 'pie',
+      name: 'Number of movies',
+      data: this.characters.map((character: IDisneyCharacter) => ({
+        name: character.name,
+        y: character.films.length,
+        films: character.films,
+      })),
+    }],
     exporting: {
       enabled: true,
       csv: {
@@ -110,5 +97,22 @@ export class PieChartComponent {
         },
       },
     },
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['characters'] && changes['characters'].currentValue) {
+      if (this.options.series && this.options.series.length > 0) {
+        this.options.series[0] = {
+          type: 'pie',
+          name: 'Number of movies',
+          data: changes['characters'].currentValue.map((character: IDisneyCharacter) => ({
+            name: character.name,
+            y: character.films.length,
+            films: character.films,
+          })),
+        }
+        this.updateFlag = true;
+      }      
+    }
   }
 }
