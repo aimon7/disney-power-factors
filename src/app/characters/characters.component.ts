@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Subscription } from 'rxjs';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -9,8 +9,8 @@ import { PaginatorHelperComponent } from '../component/paginator-helper/paginato
 import { CharacterDetailComponent } from './character-detail/character-detail.component';
 
 const GET_CHARACTERS = gql`
-  query Characters($page: Int, $pageSize: Int) {
-    characters(page: $page, pageSize: $pageSize) {
+  query Characters($page: Int, $pageSize: Int, $filter: CharacterFilterInput) {
+    characters(page: $page, pageSize: $pageSize, filter: $filter) {
         items {
             _id
             alignment
@@ -90,6 +90,7 @@ export class CharactersComponent implements OnInit {
 
   private querySubscription: Subscription;
 
+  @Input() inputValue: string;
   @ViewChild(MatSort) set matSort(sort: MatSort) {
     if (!this.dataSource.sort) {
       this.dataSource.sort = sort;
@@ -150,10 +151,20 @@ export class CharactersComponent implements OnInit {
     });
   }
 
-  apolloQuery(variables: {
+  apolloQuery(values: {
     pageSize: number;
     page: number;
   }) {
+    let variables: any = values;
+    if (this.inputValue !== '' && this.inputValue !== undefined) {
+      variables = {
+        ...values,
+        filter: {
+          name: this.inputValue
+        }
+      }
+    }
+
     return this.apollo
       .watchQuery({
         query: GET_CHARACTERS,
@@ -167,12 +178,14 @@ export class CharactersComponent implements OnInit {
   }
 
   handleQueryResult(result: any) {
-    this.characters = result?.characters?.items;
-    this.paginationInfo = result?.characters?.paginationInfo;
-
-    this.dataSource = new MatTableDataSource(this.characters.map((character: IDisneyCharacter) => {
-      return this.mappingCharacterToTable(character);
-    }));
+    if (result && result.characters) {
+      this.characters = result.characters?.items;
+      this.paginationInfo = result.characters?.paginationInfo;
+  
+      this.dataSource = new MatTableDataSource(this.characters.map((character: IDisneyCharacter) => {
+        return this.mappingCharacterToTable(character);
+      }));
+    }    
   }
 
   mappingCharacterToTable(character: IDisneyCharacter): DisneyCharacterTable {
@@ -197,6 +210,16 @@ export class CharactersComponent implements OnInit {
     const startIndex = page * pageSize;
     return `${initialText} ${startIndex + 1} of ${length}`;
   };
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['inputValue'].currentValue !== changes['inputValue'].previousValue) {
+        this.inputValue = changes['inputValue'].currentValue;
+        this.apolloQuery({
+          pageSize: this.pageSize,
+          page: 1,
+        });
+    }
+  }
 
   ngOnDestroy() {
     this.querySubscription.unsubscribe();

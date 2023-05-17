@@ -1,4 +1,12 @@
-<div style="width: 100%;">
+<div style="width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: space-between;">
     <h1>{{title}}</h1>
-    <app-characters></app-characters>
+    <form class="form">
+        <mat-form-field class="full-width-form">
+            <mat-label>Search for a Disney Character: </mat-label>
+            <input #character matInput placeholder="Ex. Mickey Mouse" [(ngModel)]="inputValue" name="inputValue"
+                id="inputValue" (ngModelChange)="this.userCharacterNameUpdate.next($event)"
+                (keydown.enter)="onEnter(character.value)">
+        </mat-form-field>
+    </form>
 </div>
+<app-characters [inputValue]="inputValue"></app-characters>
