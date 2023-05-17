@@ -21,6 +21,7 @@ import { MatIconModule} from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatListModule } from '@angular/material/list';
 import { MatDialogModule } from '@angular/material/dialog';
+import { PieChartComponent } from './component/pie-chart/pie-chart.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatGridListModule,
     MatListModule,
     MatDialogModule,
+    PieChartComponent,
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -66,3 +66,5 @@
         [initialPageSizeOptions]="pageSizeOptions">
     </app-paginator-helper>
 </div>
+
+<app-pie-chart *ngIf="!loading && !error && dataSource.data.length > 0" [characters]="characters"></app-pie-chart>
