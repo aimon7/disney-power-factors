@@ -5,13 +5,13 @@
     <div *ngIf="data.character">
         <img src="{{data.character.imageUrl}}" alt="{{data.character.name}} image" />
     </div>
-    <div *ngIf="data.character">
+    <div *ngIf="data.character && data.character.tvShows.length > 0">
         <div><span><strong>List of tv shows:</strong></span></div>
         <mat-list role="list"  *ngFor="let tvShow of data.character.tvShows">
             <mat-list-item role="listitem">{{tvShow}}</mat-list-item>
         </mat-list>
     </div>
-    <div *ngIf="data.character">
+    <div *ngIf="data.character && data.character.videoGames.length > 0">
         <div><span><strong>List of video games:</strong></span></div>
         <mat-list role="list"  *ngFor="let videoGame of data.character.videoGames">
             <mat-list-item role="listitem">{{videoGame}}</mat-list-item>
