@@ -1,3 +1,48 @@
+.main-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+  padding: 1rem;
+  width: 100%;
+}
+
+
+.character-table-wrapper {
+  text-align: center;
+  position: relative;
+  width: 700px;
+  height: calc(100vh - 330px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+}
+
+.loading-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.error-message {
+  color: red;
+}
+
+.no-data-message {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 2rem;
+  letter-spacing: 1.5rem;
+}
+
+.table-container {
+  max-height: calc(100vh - 330px);
+  overflow: auto;
+}
+
 table {
   width: 100%;
 }
@@ -8,4 +53,41 @@ th.mat-sort-header-sorted {
 
 .element-row {
   cursor: pointer;
+}
+
+.mat-column-allies {
+  max-width: 300px;
+}
+
+.mat-column-enemies {
+  max-width: 300px;
+}
+
+.pagination {
+  width: 100%;
+  bottom: 0;
+}
+
+.pie-chart-wrapper {
+  width: calc(100vw - 900px);
+  height: calc(100vh - 330px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-pie-chart {
+  align-self: center;
+}
+
+@media screen and (max-width: 1450px) {
+  .main-container {
+    flex-direction: column;
+  }
+
+  .pie-chart-wrapper {
+    width: 100%;
+    height: calc(100vh - 330px);
+  }
 }

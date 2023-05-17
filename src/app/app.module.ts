@@ -23,6 +23,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatDialogModule } from '@angular/material/dialog';
 import { PieChartComponent } from './component/pie-chart/pie-chart.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -53,6 +54,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     PieChartComponent,
     FormsModule,
     ReactiveFormsModule,
+    MatProgressSpinnerModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

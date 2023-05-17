@@ -57,6 +57,7 @@ export interface DisneyCharacterTable {
   name: string;
   tvShowsParticapating: number;
   videoGamesParticipating: number;
+  tvShows: string[];
   allies: string[];
   enemies: string[];
 }
@@ -160,7 +161,8 @@ export class CharactersComponent implements OnInit {
       variables = {
         ...values,
         filter: {
-          name: this.inputValue
+          name: this.inputValue,
+          tvShows: this.inputValue,
         }
       }
     }
@@ -196,6 +198,7 @@ export class CharactersComponent implements OnInit {
       name,
       allies,
       enemies,
+      tvShows,
       tvShowsParticapating: tvShows.length,
       videoGamesParticipating: videoGames.length,
     } as DisneyCharacterTable;

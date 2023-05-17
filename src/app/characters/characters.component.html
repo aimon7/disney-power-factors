@@ -1,68 +1,80 @@
-<div class="mat-elevation-z8" style="width: 100%;">
-    <div class="loading-indicator" *ngIf="loading">
-        Loading...
+<div class="main-container">
+    <div class="mat-elevation-z8 character-table-wrapper">
+        <div class="loading-indicator" *ngIf="loading">
+            <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+        </div>
+
+        <div class="error-message" *ngIf="error">
+            {{ error }}
+        </div>
+
+        <div class="no-data-message" *ngIf="!loading && !error && !dataSource.data.length">
+            No data available
+        </div>
+
+        <div class="table-container">
+            <table mat-table *ngIf="!loading && !error && dataSource.data.length > 0" [dataSource]="dataSource" matSort
+                (matSortChange)="announceSortChange($event)" [class.loading]="loading">
+
+                <!-- Character name Column -->
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by name">
+                        Name </th>
+                    <td mat-cell *matCellDef="let row"> {{row.name}} </td>
+                </ng-container>
+
+                <!-- Number of tv shows Column -->
+                <ng-container matColumnDef="tvShowsParticapating">
+                    <th mat-header-cell *matHeaderCellDef> No. of Tv Shows </th>
+                    <td mat-cell *matCellDef="let row"> {{row.tvShowsParticapating}} </td>
+                </ng-container>
+
+                <!-- Number of Video Games Column -->
+                <ng-container matColumnDef="videoGamesParticipating">
+                    <th mat-header-cell *matHeaderCellDef> No. of Video Games </th>
+                    <td mat-cell *matCellDef="let row"> {{row.videoGamesParticipating}} </td>
+                </ng-container>
+
+                <!-- Allies Column -->
+                <ng-container matColumnDef="allies">
+                    <th mat-header-cell *matHeaderCellDef> Allies </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-chip-listbox>
+                            <mat-chip *ngFor="let ally of row.allies">{{ ally }}</mat-chip>
+                        </mat-chip-listbox>
+                    </td>
+                </ng-container>
+
+                <!-- Emenies Column -->
+                <ng-container matColumnDef="enemies">
+                    <th mat-header-cell *matHeaderCellDef> Enemies </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-chip-listbox>
+                            <mat-chip *ngFor="let enemy of row.enemies">{{ enemy }}</mat-chip>
+                        </mat-chip-listbox>
+                    </td>
+                </ng-container>
+
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row class="element-row" *matRowDef="let row; columns: displayedColumns"
+                    (click)="openDialog(row.id)">
+                </tr>
+            </table>
+        </div>
+
+        <div class="pagination">
+            <app-paginator-helper [initialPageSize]="initialPageSize" [totalPages]="paginationInfo.totalPages"
+                [initialPageSizeOptions]="pageSizeOptions">
+            </app-paginator-helper>
+        </div>
     </div>
 
-    <div class="error-message" *ngIf="error">
-        {{ error }}
+    <div class="pie-chart-wrapper">        
+        <div class="loading-pie-chart" *ngIf="loading">
+            <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+        </div>
+        <app-pie-chart *ngIf="!loading && !error && dataSource.data.length > 0"
+            [characters]="characters"></app-pie-chart>
     </div>
-
-    <div class="no-data-message" *ngIf="!loading && !error && !dataSource.data.length">
-        No data available
-    </div>
-
-    <table mat-table *ngIf="!loading && !error && dataSource.data.length > 0" [dataSource]="dataSource"
-         matSort
-        (matSortChange)="announceSortChange($event)" [class.loading]="loading">
-
-        <!-- Character name Column -->
-        <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by name">
-                Name </th>
-            <td mat-cell *matCellDef="let row"> {{row.name}} </td>
-        </ng-container>
-
-        <!-- Number of tv shows Column -->
-        <ng-container matColumnDef="tvShowsParticapating">
-            <th mat-header-cell *matHeaderCellDef> No. of Tv Shows </th>
-            <td mat-cell *matCellDef="let row"> {{row.tvShowsParticapating}} </td>
-        </ng-container>
-
-        <!-- Number of Video Games Column -->
-        <ng-container matColumnDef="videoGamesParticipating">
-            <th mat-header-cell *matHeaderCellDef> No. of Video Games </th>
-            <td mat-cell *matCellDef="let row"> {{row.videoGamesParticipating}} </td>
-        </ng-container>
-
-        <!-- Allies Column -->
-        <ng-container matColumnDef="allies">
-            <th mat-header-cell *matHeaderCellDef> Allies </th>
-            <td mat-cell *matCellDef="let row">
-                <mat-chip-listbox>
-                    <mat-chip *ngFor="let ally of row.allies">{{ ally }}</mat-chip>
-                </mat-chip-listbox>
-            </td>
-        </ng-container>
-
-        <!-- Emenies Column -->
-        <ng-container matColumnDef="enemies">
-            <th mat-header-cell *matHeaderCellDef> Enemies </th>
-            <td mat-cell *matCellDef="let row">
-                <mat-chip-listbox>
-                    <mat-chip *ngFor="let enemy of row.enemies">{{ enemy }}</mat-chip>
-                </mat-chip-listbox>
-            </td>
-        </ng-container>
-
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row class="element-row" *matRowDef="let row; columns: displayedColumns" (click)="openDialog(row.id)">
-        </tr>
-    </table>
-
-    <app-paginator-helper [initialPageSize]="initialPageSize" [totalPages]="paginationInfo.totalPages"
-        [initialPageSizeOptions]="pageSizeOptions">
-    </app-paginator-helper>
 </div>
-
-<app-pie-chart *ngIf="!loading && !error && dataSource.data.length > 0" [characters]="characters"></app-pie-chart>
