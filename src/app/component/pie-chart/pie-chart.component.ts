@@ -1,5 +1,5 @@
+import * as ExcelJS from 'exceljs';
 import * as Highcharts from 'highcharts';
-import * as XlsxPopulate from 'xlsx-populate';
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
@@ -93,24 +93,22 @@ export class PieChartComponent implements OnChanges {
               return row.split(',');
             });
 
-            XlsxPopulate.fromBlankAsync()
-              .then((workbook: XlsxPopulate.Workbook) => {
-                const sheet = workbook.sheet(0);
-                rows.forEach((row, rowIndex) => {
-                  row.forEach((cell, cellIndex) => {
-                    sheet.cell(rowIndex + 1, cellIndex + 1).value(cell);
-                  });
-                });
-                return workbook.outputAsync();
-              })
-              .then((blob: Blob) => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'disney-characters.xlsx';
-                a.click();
-                window.URL.revokeObjectURL(url);
-              });
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Disney Characters');
+
+            rows.forEach((row, rowIndex) => {
+              worksheet.addRow(row);
+            });
+
+            workbook.xlsx.writeBuffer().then((buffer) => {
+              const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'disney-characters.xlsx';
+              a.click();
+              window.URL.revokeObjectURL(url);
+            });
           },
         },
       },
