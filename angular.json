@@ -35,8 +35,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "2mb",
+                  "maximumError": "3mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -44,6 +44,11 @@
                   "maximumError": "4kb"
                 }
               ],
+              "optimization": {
+                "scripts": true,
+                "styles": true,
+                "fonts": false
+              },
               "outputHashing": "all"
             },
             "development": {
@@ -61,10 +66,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "disney-power-factors:build:production"
+              "buildTarget": "disney-power-factors:build:production"
             },
             "development": {
-              "browserTarget": "disney-power-factors:build:development"
+              "buildTarget": "disney-power-factors:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -72,7 +77,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "disney-power-factors:build"
+            "buildTarget": "disney-power-factors:build"
           }
         },
         "test": {

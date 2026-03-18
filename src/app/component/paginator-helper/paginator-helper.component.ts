@@ -3,7 +3,8 @@ import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from
 @Component({
   selector: 'app-paginator-helper',
   templateUrl: './paginator-helper.component.html',
-  styleUrls: ['./paginator-helper.component.css']
+  styleUrls: ['./paginator-helper.component.css'],
+  standalone: false,
 })
 export class PaginatorHelperComponent implements OnChanges {
   @Input() initialPageSize: number = 50;

@@ -6,7 +6,8 @@ import {MAT_DIALOG_DATA} from '@angular/material/dialog';
 @Component({
   selector: 'app-character-detail',
   templateUrl: './character-detail.component.html',
-  styleUrls: ['./character-detail.component.css']
+  styleUrls: ['./character-detail.component.css'],
+  standalone: false,
 })
 export class CharacterDetailComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: {character: IDisneyCharacter}) {}
