@@ -72,7 +72,8 @@ export interface PaginationInfo {
 @Component({
   selector: 'app-characters',
   templateUrl: './characters.component.html',
-  styleUrls: ['./characters.component.css']
+  styleUrls: ['./characters.component.css'],
+  standalone: false,
 })
 export class CharactersComponent implements OnInit {
   dataSource = new MatTableDataSource<DisneyCharacterTable>([]);
@@ -86,7 +87,7 @@ export class CharactersComponent implements OnInit {
 
   characters: IDisneyCharacter[] = [];
   paginationInfo: PaginationInfo = {} as PaginationInfo;
-  loading: boolean;
+  loading = true;
   error: any;
 
   private querySubscription: Subscription;

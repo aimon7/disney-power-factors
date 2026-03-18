@@ -1,10 +1,12 @@
-import { APOLLO_FLAGS, APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
+import { APOLLO_FLAGS, provideApollo } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
-import { NgModule } from '@angular/core';
+import { inject, NgModule } from '@angular/core';
 import { ApolloClientOptions, InMemoryCache } from '@apollo/client/core';
 
 const uri = 'https://api.disneyapi.dev/graphql'; // <-- add the URL of the GraphQL server here
-export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
+export function createApollo(): ApolloClientOptions {
+  const httpLink = inject(HttpLink);
+
   return {
     link: httpLink.create({ uri }),
     cache: new InMemoryCache(),
@@ -12,7 +14,6 @@ export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
 }
 
 @NgModule({
-  exports: [ApolloModule],
   providers: [
     {
       provide: APOLLO_FLAGS,
@@ -20,11 +21,7 @@ export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
         useInitialLoading: true, // enable it here
       },
     },
-    {
-      provide: APOLLO_OPTIONS,
-      useFactory: createApollo,
-      deps: [HttpLink],
-    },
+    provideApollo(createApollo),
   ],
 })
 export class GraphQLModule {}
