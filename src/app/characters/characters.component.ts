@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, NgZone, OnInit, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Subscription } from 'rxjs';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -12,7 +12,6 @@ const GET_CHARACTERS = gql`
   query Characters($page: Int, $pageSize: Int, $filter: CharacterFilterInput) {
     characters(page: $page, pageSize: $pageSize, filter: $filter) {
         items {
-            _id
             alignment
             allies
             enemies
@@ -21,7 +20,6 @@ const GET_CHARACTERS = gql`
             name
             parkAttractions
             shortFilms
-            sourceUrl
             tvShows
             url
             videoGames
@@ -37,10 +35,8 @@ const GET_CHARACTERS = gql`
 `;
 
 export interface IDisneyCharacter {
-  _id: string;
   url: string;
   name: string;
-  sourceUrl: string;
   films: string[];
   imageUrl: string;
   shortFilms: string[];
@@ -88,9 +84,9 @@ export class CharactersComponent implements OnInit {
   characters: IDisneyCharacter[] = [];
   paginationInfo: PaginationInfo = {} as PaginationInfo;
   loading = true;
-  error: any;
+  error: any = null;
 
-  private querySubscription: Subscription;
+  private querySubscription?: Subscription;
 
   @Input() inputValue: string;
   @ViewChild(MatSort) set matSort(sort: MatSort) {
@@ -102,6 +98,8 @@ export class CharactersComponent implements OnInit {
 
   constructor(
     private apollo: Apollo,
+    private ngZone: NgZone,
+    private changeDetectorRef: ChangeDetectorRef,
     private _liveAnnouncer: LiveAnnouncer,
     public dialog: MatDialog
   ) { }
@@ -145,7 +143,7 @@ export class CharactersComponent implements OnInit {
 
   openDialog(id: string) {
     const dialogRef = this.dialog.open(CharacterDetailComponent, {
-      data: { character: this.characters.find((character: IDisneyCharacter) => character._id === id) },
+      data: { character: this.characters.find((character: IDisneyCharacter) => character.url === id) },
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -157,6 +155,10 @@ export class CharactersComponent implements OnInit {
     pageSize: number;
     page: number;
   }) {
+    this.querySubscription?.unsubscribe();
+    this.loading = true;
+    this.error = null;
+
     let variables: any = values;
     if (this.inputValue !== '' && this.inputValue !== undefined) {
       variables = {
@@ -168,16 +170,32 @@ export class CharactersComponent implements OnInit {
       }
     }
 
-    return this.apollo
-      .watchQuery({
+    this.querySubscription = this.apollo
+      .query({
         query: GET_CHARACTERS,
         variables,
+        fetchPolicy: 'network-only',
       })
-      .valueChanges.subscribe(({ data, loading, error }) => {
-        this.handleQueryResult(data);
-        this.loading = loading;
-        this.error = error;
+      .subscribe({
+        next: ({ data }) => {
+          this.ngZone.run(() => {
+            this.handleQueryResult(data);
+            this.loading = false;
+            this.changeDetectorRef.detectChanges();
+          });
+        },
+        error: (error) => {
+          this.ngZone.run(() => {
+            this.characters = [];
+            this.paginationInfo = {} as PaginationInfo;
+            this.dataSource = new MatTableDataSource<DisneyCharacterTable>([]);
+            this.loading = false;
+            this.error = error;
+            this.changeDetectorRef.detectChanges();
+          });
+        },
       });
+    return this.querySubscription;
   }
 
   handleQueryResult(result: any) {
@@ -192,10 +210,10 @@ export class CharactersComponent implements OnInit {
   }
 
   mappingCharacterToTable(character: IDisneyCharacter): DisneyCharacterTable {
-    const { tvShows, videoGames, name, allies, enemies, _id } = character;
+    const { tvShows, videoGames, name, allies, enemies, url } = character;
 
     return {
-      id: _id,
+      id: url,
       name,
       allies,
       enemies,
@@ -226,7 +244,7 @@ export class CharactersComponent implements OnInit {
   }
 
   ngOnDestroy() {
-    this.querySubscription.unsubscribe();
+    this.querySubscription?.unsubscribe();
     this.paginator.onPageChange.unsubscribe();
     this.paginator.onPageSizeChange.unsubscribe();
   }
